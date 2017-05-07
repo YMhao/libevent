@@ -689,7 +689,12 @@ bufferevent_decref_and_unlock_(struct bufferevent *bufev)
 #define MAX_CBS 16
 	struct event_callback *cbs[MAX_CBS];
 
-	EVUTIL_ASSERT(bufev_private->refcnt > 0);
+        EVUTIL_ASSERT(bufev_private->refcnt >= 0);
+
+        if(0 == bufev_private->refcnt) {
+            BEV_UNLOCK(bufev);
+            return 0;
+        }
 
 	if (--bufev_private->refcnt) {
 		BEV_UNLOCK(bufev);
